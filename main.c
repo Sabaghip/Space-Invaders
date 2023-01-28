@@ -5,6 +5,7 @@
 #include<string.h>
 
 #include "key.h"
+#include "game.h"
 
 void loop(){};
 
@@ -45,11 +46,18 @@ int mainMenu(){
     }
 }
 
+void getName(){
+    system("cls");
+    printf("Enter your name : ");
+    scanf("%s", name);
+    loop();
+}
+
 int main(){
     while(1){
         int choice = mainMenu();
         if(choice == 1){
-            loop();
+            getName();
         }
         else{
             showAboutUs();
