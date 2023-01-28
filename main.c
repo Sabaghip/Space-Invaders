@@ -1,18 +1,32 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<conio.h>
-#include<time.h>
-#include<string.h>
-
-#include "key.h"
 #include "game.h"
-
-void loop(){};
 
 void delay(int d){
     clock_t temp = clock() + d;
     while(temp > clock()); 
 }
+
+void loop(){
+    gameInit();
+    int i = 0;
+    while(1){
+        updateLCD();
+        if(i % 100 == 0){
+            updateLCD();
+        }else{
+            if(kbhit()){
+                checkKeyboard();
+            }
+            if(i % 6 == 0){
+                updateShots();
+            }
+        }
+        i++;
+        if(i > 2000){
+            i=0;
+        }
+        delay(5);
+    }
+};
 
 void showAboutUs(){
     time_t t;
