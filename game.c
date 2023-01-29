@@ -2,11 +2,14 @@
 
 struct player me = {2, 19};
 int enemiesHealths[20][4];
+//0 for not special or 2 healts, 1 for faster shots
+int enemiesType[20][4];
 int shots[20][4];
 int enemyShots[20][4];
 
 int enemiesTime = 0;
 int enemiesCount = 0;
+int enemyRowCounter = 0;
 
 
 void delay(int d){
@@ -19,18 +22,40 @@ void arrayInit(){
         for(int j = 0; j < 4; j++)
             strcpy(array[i][j] , " ");
 
-    for(int i = 0; i < 20; i++)
-        for(int j = 0; j < 4; j++)
-            if(enemiesHealths[i][j] > 0){
+    for(int i = 0; i < 20; i++){
+        for(int j = 0; j < 4; j++){
+            if(enemiesType[i][j] == 1){
+                strcpy(array[i][j], color_red"^");
+            }
+            else if(enemiesHealths[i][j] == 2){
+                strcpy(array[i][j], color_purple"*");
+            }
+            else if(enemiesHealths[i][j] == 1){
                 strcpy(array[i][j], color_red"*");
             }
+        }
+    }
     strcpy(array[me.y][me.x], color_green"U");
 }
 
 void gameInit(){
     for(int i = 0; i < 3; i++){
+        enemyRowCounter++;
         for(int j = 0; j < 4; j++){
-            enemiesHealths[i][j] = 1;
+            if(i % 2 == 0){
+                enemiesHealths[i][j] = 1;
+                enemiesType[i][j] = 0;
+            }
+            else{
+                if(j % 2 == 0){
+                    enemiesHealths[i][j] = 2;
+                    enemiesType[i][j] = 0;
+                }
+                else{
+                    enemiesHealths[i][j] = 1;
+                    enemiesType[i][j] = 1;
+                }
+            }
         }
     }
     arrayInit();
@@ -100,11 +125,14 @@ void updateShotsOnArray(){
 void updateEnemiesOnArray(){
     for(int i = 0; i < 20; i++){
         for(int j = 0; j < 4; j++){
-            if(enemiesHealths[i][j] > 0){
-                strcpy(array[i][j], color_red"*");
+            if(enemiesType[i][j] == 1){
+                strcpy(array[i][j], color_red"^");
             }
-            else{
-                strcpy(array[i][j], " ");
+            else if(enemiesHealths[i][j] == 2){
+                strcpy(array[i][j], color_purple"*");
+            }
+            else if(enemiesHealths[i][j] == 1) {
+                strcpy(array[i][j], color_red"*");
             }
         }
     }
@@ -139,6 +167,7 @@ void updateShots(){
                         if(enemiesCount == 0){
                             win();
                         }
+                        strcpy(array[i][j], " ");
                     }
                     shots[i][j] = 0;
                     continue;
@@ -153,22 +182,36 @@ void updateShots(){
     }
     for(int i = 19; i >= 0; i--){
         for(int j = 0; j < 4; j++){
-            if(enemyShots[i][j] > 0){
-                if(me.x == j){
-                    if(me.y == i){
-                        me.health--;
-                        if(me.health == 0){
-                            loose();
-                        }
-                        strcpy(array[i][j], " ");
-                        enemyShots[i][j] = 0;
-                        continue;
+            if(enemyShots[i][j] == 1){
+                if(me.x == j && me.y == i){
+                    me.health--;
+                    if(me.health == 0){
+                        loose();
                     }
+                    strcpy(array[i][j], " ");
+                    enemyShots[i][j] = 0;
+                    continue;
                 }
                 strcpy(array[i][j], " ");
                 enemyShots[i][j] = 0;
                 if(i < 19){
                     enemyShots[i + 1][j] = 1;
+                }
+            }
+            else if(enemyShots[i][j] == 2){
+                if(me.x == j && (me.y == i || me.y == i + 1)){
+                    me.health--;
+                    if(me.health == 0){
+                        loose();
+                    }
+                    strcpy(array[i][j], " ");
+                    enemyShots[i][j] = 0;
+                    continue;
+                }
+                strcpy(array[i][j], " ");
+                enemyShots[i][j] = 0;
+                if(i < 18){
+                    enemyShots[i + 2][j] = 2;
                 }
             }
         }
@@ -184,13 +227,29 @@ void updateEnemies(){
                     return;
                 }
                 enemiesHealths[i + 1][j] = enemiesHealths[i][j];
+                enemiesType[i + 1][j] = enemiesType[i][j];
                 enemiesHealths[i][j] = 0;
+                enemiesType[i][j] = 0;
             }
         }
     }
     for(int j = 0; j < 4; j++){
-        enemiesHealths[0][j] = 1;
+        if(enemyRowCounter % 2 == 0){
+            enemiesHealths[0][j] = 1;
+            enemiesType[0][j] = 0;
+        }
+        else{
+            if(j % 2 == 0){
+                enemiesHealths[0][j] = 2;
+                enemiesType[0][j] = 0;
+            }
+            else{
+                enemiesHealths[0][j] = 1;
+                enemiesType[0][j] = 1;
+            }
+        }
     }
+    enemyRowCounter++;
 }
 
 void loose(){
@@ -206,7 +265,12 @@ void win(){
 void enemyshot(){
     for(int i = 18; i >= 0; i--){
         if(enemiesHealths[i][me.x] > 0){
-            enemyShots[i + 1][me.x] = 1;
+            if(enemiesType[i][me.x] == 1){
+                enemyShots[i + 1][me.x] = 2;
+            }
+            else{
+                enemyShots[i + 1][me.x] = 1;
+            }
             return;
         }
     }
@@ -217,14 +281,14 @@ void loop(){
     int i = 1;
     updateLCD();
     int timeForEnemy = (int)(enemiesTime * 50); 
-    int timeForEnemyShot = timeForEnemy * 3;
+    int timeForEnemyShot = timeForEnemy * 2;
     while(1){
         int j = 0;
         if(kbhit()){
             checkKeyboard();
             j++;
         }
-        if(i % 5 == 0){
+        if(i % 7 == 0){
             updateShots();
             j++;
         }

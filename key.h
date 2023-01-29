@@ -9,4 +9,5 @@
 #define color_red "\x1b[31m"
 #define color_green "\x1b[32m"
 #define color_blue "\x1b[34m"
+#define color_purple "\x1b[35m"
 #define color_reset "\x1b[0m"
