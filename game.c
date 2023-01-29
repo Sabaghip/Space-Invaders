@@ -103,6 +103,7 @@ void updateLCD(){
         }
         printf("\n");
     }
+    printf("Health : %d    enemies : %d\n", me.health, enemiesCount);
 }
 
 void updateShots(){
@@ -111,6 +112,12 @@ void updateShots(){
             if(shots[i][j] > 0){
                 if(enemiesHealths[i][j] > 0){
                     enemiesHealths[i][j] -= 1;
+                    if(enemiesHealths[i][j] == 0){
+                        enemiesCount--;
+                        if(enemiesCount == 0){
+                            win();
+                        }
+                    }
                     shots[i][j] = 0;
                     continue;
                 }
