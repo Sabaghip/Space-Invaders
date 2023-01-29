@@ -34,5 +34,5 @@ void playHard();
 void loop();
 void loose();
 void win();
-void delay();
+void delay(int);
 void enemyshot();
