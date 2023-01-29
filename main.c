@@ -1,9 +1,5 @@
 #include "game.h"
 
-void delay(int d){
-    clock_t temp = clock() + d;
-    while(temp > clock()); 
-}
 
 void showAboutUs(){
     time_t t;

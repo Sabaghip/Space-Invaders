@@ -3,9 +3,16 @@
 struct player me = {2, 19};
 int enemiesHealths[20][4];
 int shots[20][4];
+int enemyShots[20][4];
 
 int enemiesTime = 0;
 int enemiesCount = 0;
+
+
+void delay(int d){
+    clock_t temp = clock() + d;
+    while(temp > clock()); 
+}
 
 void arrayInit(){
     for(int i = 0; i < 20; i++)
@@ -62,27 +69,32 @@ void shoot(){
 void checkKeyboard(){
     int temp = getch();
     switch(temp){
-        case 49:
+        case KEY_1:
             exit(1);
             break;
-        case 97:
+        case KEY_A:
             goLeft();
             break;
-        case 100:
+        case KEY_D:
             goRight();
             break;
-        case 32:
+        case KEY_SPACE:
             shoot();
             break;
     }
 }
 
 void updateShotsOnArray(){
-    for(int i = 0; i < 20; i++)
-        for(int j = 0; j < 4; j++)
+    for(int i = 0; i < 20; i++){
+        for(int j = 0; j < 4; j++){
             if(shots[i][j] > 0){
                 strcpy(array[i][j], color_blue"*");
             }
+            if(enemyShots[i][j] > 0){
+                strcpy(array[i][j], color_green"*");
+            }
+        }
+    }
 }
 
 void updateEnemiesOnArray(){
@@ -117,8 +129,8 @@ void updateLCD(){
 }
 
 void updateShots(){
-    for(int i = 0; i < 20; i++)
-        for(int j = 0; j < 4; j++)
+    for(int i = 0; i < 20; i++){
+        for(int j = 0; j < 4; j++){
             if(shots[i][j] > 0){
                 if(enemiesHealths[i][j] > 0){
                     enemiesHealths[i][j] -= 1;
@@ -133,12 +145,34 @@ void updateShots(){
                 }
                 strcpy(array[i][j], " ");
                 shots[i][j] = 0;
-                if(i >= 0){
+                if(i > 0){
                     shots[i - 1][j] = 1;
                 }
             }
-        
-        
+        }
+    }
+    for(int i = 19; i >= 0; i--){
+        for(int j = 0; j < 4; j++){
+            if(enemyShots[i][j] > 0){
+                if(me.x == j){
+                    if(me.y == i){
+                        me.health--;
+                        if(me.health == 0){
+                            loose();
+                        }
+                        strcpy(array[i][j], " ");
+                        enemyShots[i][j] = 0;
+                        continue;
+                    }
+                }
+                strcpy(array[i][j], " ");
+                enemyShots[i][j] = 0;
+                if(i < 19){
+                    enemyShots[i + 1][j] = 1;
+                }
+            }
+        }
+    }
 }
 
 void updateEnemies(){
@@ -169,11 +203,21 @@ void win(){
     exit(1);
 }
 
+void enemyshot(){
+    for(int i = 18; i >= 0; i--){
+        if(enemiesHealths[i][me.x] > 0){
+            enemyShots[i + 1][me.x] = 1;
+            return;
+        }
+    }
+}
+
 void loop(){
     gameInit();
     int i = 1;
     updateLCD();
     int timeForEnemy = (int)(enemiesTime * 50); 
+    int timeForEnemyShot = timeForEnemy * 3;
     while(1){
         int j = 0;
         if(kbhit()){
@@ -186,6 +230,10 @@ void loop(){
         }
         if(i % timeForEnemy == 0){
             updateEnemies();
+            j++;
+        }
+        if(i % timeForEnemyShot == 0){
+            enemyshot();
             j++;
         }
         if(j){

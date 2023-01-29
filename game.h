@@ -35,3 +35,4 @@ void loop();
 void loose();
 void win();
 void delay();
+void enemyshot();
