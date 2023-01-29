@@ -5,29 +5,6 @@ void delay(int d){
     while(temp > clock()); 
 }
 
-void loop(){
-    gameInit();
-    int i = 0;
-    while(1){
-        updateLCD();
-        if(i % 100 == 0){
-            updateLCD();
-        }else{
-            if(kbhit()){
-                checkKeyboard();
-            }
-            if(i % 6 == 0){
-                updateShots();
-            }
-        }
-        i++;
-        if(i > 2000){
-            i=0;
-        }
-        delay(5);
-    }
-};
-
 void showAboutUs(){
     time_t t;
     while(1){
@@ -64,7 +41,24 @@ void getName(){
     system("cls");
     printf(color_green"Enter your name : "color_reset);
     scanf("%s", name);
-    loop();
+}
+
+void getDificalty(){
+    system("cls");
+    printf(color_green"Dificulty ?\n1. Easy\n2. Normal\n3.Hard"color_reset);
+    while(1){
+        switch(getch()){
+            case KEY_1:
+                playEasy();
+                break;
+            case KEY_2:
+                playNormal();
+                break;
+            case KEY_3:
+                playHard();
+                break;
+        }
+    }
 }
 
 int main(){
@@ -72,6 +66,7 @@ int main(){
         int choice = mainMenu();
         if(choice == 1){
             getName();
+            getDificalty();
         }
         else{
             showAboutUs();

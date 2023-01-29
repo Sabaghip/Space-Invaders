@@ -4,6 +4,9 @@ struct player me = {2, 19};
 int enemiesHealths[20][4];
 int shots[20][4];
 
+int enemiesTime = 0;
+int enemiesCount = 0;
+
 void arrayInit(){
     for(int i = 0; i < 20; i++)
         for(int j = 0; j < 4; j++)
@@ -119,4 +122,81 @@ void updateShots(){
             }
         
         
+}
+
+void updateEnemies(){
+    for(int i = 19; i >= 0; i--){
+        for(int j = 0; j < 4; j++){
+            if(enemiesHealths[i][j] > 0){
+                if(i == 19){
+                    loose();
+                    return;
+                }
+                enemiesHealths[i + 1][j] = enemiesHealths[i][j];
+                enemiesHealths[i][j] = 0;
+            }
+        }
+    }
+    for(int j = 0; j < 4; j++){
+        enemiesHealths[0][j] = 1;
+    }
+}
+
+void loose(){
+    printf("loose!!!"color_reset);
+    exit(1);
+}
+
+void win(){
+    printf("win!!!"color_reset);
+    exit(1);
+}
+
+void loop(){
+    gameInit();
+    int i = 1;
+    updateLCD();
+    int timeForEnemy = (int)(enemiesTime * 50); 
+    while(1){
+        int j = 0;
+        if(kbhit()){
+            checkKeyboard();
+            j++;
+        }
+        if(i % 5 == 0){
+            updateShots();
+            j++;
+        }
+        if(i % timeForEnemy == 0){
+            updateEnemies();
+            j++;
+        }
+        if(j){
+            updateLCD();
+        }
+        i++;
+        if(i > 2000){
+            i=0;
+        }
+        delay(5);
+    }
+};
+
+void playEasy(){
+    enemiesTime = 5;
+    me.health = 7;
+    enemiesCount = 15;
+    loop();
+}
+void playNormal(){
+    enemiesTime = 3;
+    me.health = 5;
+    enemiesCount = 25;
+    loop();
+}
+void playHard(){
+    enemiesTime = 1;
+    me.health = 3;
+    enemiesCount = 35;
+    loop();
 }
