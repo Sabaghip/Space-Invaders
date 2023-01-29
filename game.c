@@ -35,12 +35,22 @@ void goLeft(){
         me.x--;
         strcpy(array[me.y][me.x], color_green"U");
     }
+    else{
+        strcpy(array[me.y][me.x], " ");
+        me.x = 3;
+        strcpy(array[me.y][me.x], color_green"U");
+    }
 }
 
 void goRight(){
     if(me.x < 3){
         strcpy(array[me.y][me.x], " ");
         me.x++;
+        strcpy(array[me.y][me.x], color_green"U");
+    }
+    else{
+        strcpy(array[me.y][me.x], " ");
+        me.x = 0;
         strcpy(array[me.y][me.x], color_green"U");
     }
 }
