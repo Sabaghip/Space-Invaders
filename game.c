@@ -9,11 +9,13 @@ int enemiesHealths[20][4];
 int enemiesType[20][4];
 int shots[20][4];
 int enemyShots[20][4];
+int boss[20][4];
 
 int enemiesTime = 0;
 int enemiesCount = 0;
 int enemyRowCounter = 0;
 int enemiesCountTemp = 0;
+int bossHealth = 10;
 
 
 void delay(int d){
@@ -36,6 +38,9 @@ void arrayInit(){
             }
             else if(enemiesHealths[i][j] == 1){
                 strcpy(array[i][j], color_red"*");
+            }
+            else if(boss[i][j] == 1){
+                strcpy(array[i][j], color_purple"#");
             }
         }
     }
@@ -139,6 +144,9 @@ void updateEnemiesOnArray(){
             else if(enemiesHealths[i][j] == 1) {
                 strcpy(array[i][j], color_red"*");
             }
+            else if(boss[i][j] == 1){
+                strcpy(array[i][j], color_purple"#");
+            }
         }
     }
 }
@@ -156,6 +164,9 @@ void updateLCD(){
     else{
         printf("\n");
     }
+    if(bossHealth > 0){
+        printf(color_green"BOSS HEALTH : %d\n"color_reset, bossHealth);
+    }
     if(enemiesCount <= 3){
         printf(color_green"JUST %d MORE ENEMIES TO WIN\n"color_reset, enemiesCount);
     }
@@ -165,7 +176,7 @@ void updateLCD(){
     updateEnemiesOnArray();
     updateShotsOnArray();
     updateMeOnArray();
-    for(int i = 0; i < 20; i++){
+    for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             printf("%s   ", array[i][j]);
         }
@@ -177,12 +188,20 @@ void updateShots(){
     for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             if(shots[i][j] > 0){
+                if(boss[i][j] == 1){
+                    bossHealth--;
+                    if(bossHealth == 0){
+                        win();
+                    }
+                    shots[i][j] = 0;
+                    continue;
+                }
                 if(enemiesHealths[i][j] > 0){
                     enemiesHealths[i][j] -= 1;
                     if(enemiesHealths[i][j] == 0){
                         enemiesCount--;
                         if(enemiesCount == 0){
-                            win();
+                            playBoss();
                         }
                         strcpy(array[i][j], " ");
                         enemiesType[i][j] = 0;
@@ -509,6 +528,145 @@ void printDetails(char dificulty[]){
     }
 }
 
+void bossInit(){
+    for(int i = 0; i < 20; i++)
+        for(int j = 0; j < 4; j++){
+            strcpy(array[i][j] , " ");
+            shots[i][j] = 0;
+            enemiesHealths[i][j] = 0;
+            enemiesType[i][j] = 0;
+            enemyShots[i][j] = 0;
+        }
+    srand(time(NULL));
+    bossHealth = 10;
+    for(int i = Y_UP + 2; i < Y_UP + 4; i++){
+        for(int j = 1; j < 3; j++){
+            boss[i][j] = 1;
+        }
+    }
+}
+
+void bossMove(){
+    int temp = rand()%4;
+    if(temp == 0){
+        //go right
+        for(int i = Y_UP; i < Y_DOWN; i++){
+            if(boss[i][3] == 1){
+                return;
+            }
+        }
+        for(int i = Y_UP; i < Y_DOWN; i++){
+            for(int j = 2; j >= 0; j--){
+                if(boss[i][j] == 1){
+                    boss[i][j] = 0;
+                    strcpy(array[i][j], " ");
+                    boss[i][j + 1] = 1;
+                    strcpy(array[i][j + 1], color_purple"#");
+                }
+            }
+        }
+    }
+    else if(temp == 1){
+        //go left
+        for(int i = Y_UP; i < Y_DOWN; i++){
+            if(boss[i][0] == 1){
+                return;
+            }
+        }
+        for(int i = Y_UP; i < Y_DOWN; i++){
+            for(int j = 1; j < 4; j++){
+                if(boss[i][j] == 1){
+                    strcpy(array[i][j], " ");
+                    boss[i][j] = 0;
+                    strcpy(array[i][j - 1], color_purple"#");
+                    boss[i][j - 1] = 1;
+                }
+            }
+        }
+    }
+    else if(temp == 2){
+        //go down
+        for(int i = 0; i < 4; i++){
+            if(boss[Y_DOWN - 6][i] == 1){
+                return;
+            }
+        }
+        for(int i = Y_DOWN - 6; i >= Y_UP; i--){
+            for(int j = 3; j >= 0; j--){
+                if(boss[i][j] == 1){
+                    boss[i][j] = 0;
+                    strcpy(array[i][j], " ");
+                    boss[i + 1][j] = 1;
+                    strcpy(array[i + 1][j], color_purple"#");
+                }
+            }
+        }
+    }
+    else if(temp == 3){
+        //go up
+        for(int i = 0; i < 4; i++){
+            if(boss[Y_UP][i] == 1){
+                return;
+            }
+        }
+        for(int i = Y_UP; i <= Y_DOWN - 6; i++){
+            for(int j = 3; j >= 0; j--){
+                if(boss[i][j] == 1){
+                    boss[i][j] = 0;
+                    strcpy(array[i][j], " ");
+                    boss[i - 1][j] = 1;
+                    strcpy(array[i - 1][j], color_purple"#");
+                }
+            }
+        }
+        
+    }
+}
+
+void bossShot(){
+    for(int i = Y_DOWN - 5; i >= Y_UP; i--){
+        if(boss[i][me.x] > 0){
+            enemyShots[i + 1][me.x] = 2;
+            return;
+        }
+    }
+}
+
+void bossFight(){
+    bossInit();
+    int i = 1;
+    updateLCD();
+    int timeForBossMove = (int)(enemiesTime * 30); 
+    int timeForBossShoot = (int)(timeForBossMove * 1.5);
+    while(1){
+        int j = 0;
+        if(kbhit()){
+            checkKeyboard();
+            j++;
+        }
+        if(i % 7 == 0){
+            updateShots();
+            j++;
+        }
+        if(i % timeForBossMove == 0){
+            bossMove();
+            j++;
+        }
+        if(i % timeForBossShoot == 0){
+            bossShot();
+            j++;
+        }
+        if(j){
+            updateLCD();
+        }
+        i++;
+        if(i > 2000){
+            i=0;
+        }
+        delay(5);
+    }
+}
+
 void playEasy(){
     enemiesTime = 5;
     me.health = 7;
@@ -544,4 +702,12 @@ void playAuto(){
     printDetails("Hard");
     startAnimation();
     autoLoop();
+}
+void playBoss(){
+    enemiesTime = 1;
+    if(me.health == 0){
+        me.health = 3;
+    }
+    startAnimation();
+    bossFight();
 }

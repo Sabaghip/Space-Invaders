@@ -41,7 +41,7 @@ void getName(){
 
 void getDificalty(){
     system("cls");
-    printf(color_green"Dificulty ?\n1. Easy\n2. Normal\n3. Hard\n4. Auto-play"color_reset);
+    printf(color_green"Dificulty ?\n1. Easy\n2. Normal\n3. Hard\n4. Auto-play\n5. Boss Fight"color_reset);
     while(1){
         switch(getch()){
             case KEY_1:
@@ -55,6 +55,9 @@ void getDificalty(){
                 break;
             case KEY_4:
                 playAuto();
+                break;
+            case KEY_5:
+                playBoss();
                 break;
         }
     }

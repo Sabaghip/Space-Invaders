@@ -44,3 +44,8 @@ void autoLoop();
 void autoMove();
 void autoShoot();
 void playAuto();
+void bossFight();
+void bossShot();
+void bossMove();
+void bossInit();
+void playBoss();
