@@ -1,6 +1,9 @@
 #include "game.h"
 
-struct player me = {2, 19};
+
+const int Y_UP = 0;
+const int Y_DOWN = 17;
+struct player me = {2, Y_DOWN - 1};
 int enemiesHealths[20][4];
 //0 for not special or 2 healts, 1 for faster shots
 int enemiesType[20][4];
@@ -10,6 +13,7 @@ int enemyShots[20][4];
 int enemiesTime = 0;
 int enemiesCount = 0;
 int enemyRowCounter = 0;
+int enemiesCountTemp = 0;
 
 
 void delay(int d){
@@ -22,7 +26,7 @@ void arrayInit(){
         for(int j = 0; j < 4; j++)
             strcpy(array[i][j] , " ");
 
-    for(int i = 0; i < 20; i++){
+    for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             if(enemiesType[i][j] == 1){
                 strcpy(array[i][j], color_red"^");
@@ -39,7 +43,7 @@ void arrayInit(){
 }
 
 void gameInit(){
-    for(int i = 0; i < 3; i++){
+    for(int i = Y_UP; i < Y_UP + 3; i++){
         enemyRowCounter++;
         for(int j = 0; j < 4; j++){
             if(i % 2 == 0){
@@ -110,7 +114,7 @@ void checkKeyboard(){
 }
 
 void updateShotsOnArray(){
-    for(int i = 0; i < 20; i++){
+    for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             if(shots[i][j] > 0){
                 strcpy(array[i][j], color_blue"*");
@@ -123,7 +127,7 @@ void updateShotsOnArray(){
 }
 
 void updateEnemiesOnArray(){
-    for(int i = 0; i < 20; i++){
+    for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             if(enemiesType[i][j] == 1){
                 strcpy(array[i][j], color_red"^");
@@ -144,20 +148,32 @@ void updateMeOnArray(){
 
 void updateLCD(){
     system("cls");
+    printf(color_reset"Health : %d    enemies : %d\n", me.health, enemiesCount);
+    if(me.health == 1){
+        printf(color_red"YOU HAVE ONE HEALTH!!!\n"color_reset);
+    }
+    else{
+        printf("\n");
+    }
+    if(enemiesCount <= 3){
+        printf(color_green"JUST %d MORE ENEMIES TO WIN\n"color_reset, enemiesCount);
+    }
+    else{
+        printf("\n");
+    }
     updateEnemiesOnArray();
     updateShotsOnArray();
     updateMeOnArray();
     for(int i = 0; i < 20; i++){
         for(int j = 0; j < 4; j++){
-            printf("%s ", array[i][j]);
+            printf("%s   ", array[i][j]);
         }
         printf("\n");
     }
-    printf("Health : %d    enemies : %d\n", me.health, enemiesCount);
 }
 
 void updateShots(){
-    for(int i = 0; i < 20; i++){
+    for(int i = Y_UP; i < Y_DOWN; i++){
         for(int j = 0; j < 4; j++){
             if(shots[i][j] > 0){
                 if(enemiesHealths[i][j] > 0){
@@ -168,19 +184,20 @@ void updateShots(){
                             win();
                         }
                         strcpy(array[i][j], " ");
+                        enemiesType[i][j] = 0;
                     }
                     shots[i][j] = 0;
                     continue;
                 }
                 strcpy(array[i][j], " ");
                 shots[i][j] = 0;
-                if(i > 0){
+                if(i > Y_UP){
                     shots[i - 1][j] = 1;
                 }
             }
         }
     }
-    for(int i = 19; i >= 0; i--){
+    for(int i = Y_DOWN - 1; i >= Y_UP; i--){
         for(int j = 0; j < 4; j++){
             if(enemyShots[i][j] == 1){
                 if(me.x == j && me.y == i){
@@ -194,7 +211,7 @@ void updateShots(){
                 }
                 strcpy(array[i][j], " ");
                 enemyShots[i][j] = 0;
-                if(i < 19){
+                if(i < Y_DOWN - 1){
                     enemyShots[i + 1][j] = 1;
                 }
             }
@@ -210,7 +227,7 @@ void updateShots(){
                 }
                 strcpy(array[i][j], " ");
                 enemyShots[i][j] = 0;
-                if(i < 18){
+                if(i < Y_DOWN - 2){
                     enemyShots[i + 2][j] = 2;
                 }
             }
@@ -219,7 +236,7 @@ void updateShots(){
 }
 
 void updateEnemies(){
-    for(int i = 19; i >= 0; i--){
+    for(int i = Y_DOWN - 1; i >= Y_UP; i--){
         for(int j = 0; j < 4; j++){
             if(enemiesHealths[i][j] > 0){
                 if(i == 19){
@@ -235,17 +252,17 @@ void updateEnemies(){
     }
     for(int j = 0; j < 4; j++){
         if(enemyRowCounter % 2 == 0){
-            enemiesHealths[0][j] = 1;
-            enemiesType[0][j] = 0;
+            enemiesHealths[Y_UP][j] = 1;
+            enemiesType[Y_UP][j] = 0;
         }
         else{
             if(j % 2 == 0){
-                enemiesHealths[0][j] = 2;
-                enemiesType[0][j] = 0;
+                enemiesHealths[Y_UP][j] = 2;
+                enemiesType[Y_UP][j] = 0;
             }
             else{
-                enemiesHealths[0][j] = 1;
-                enemiesType[0][j] = 1;
+                enemiesHealths[Y_UP][j] = 1;
+                enemiesType[Y_UP][j] = 1;
             }
         }
     }
@@ -253,17 +270,19 @@ void updateEnemies(){
 }
 
 void loose(){
-    printf("loose!!!"color_reset);
+    system("cls");
+    printf(color_red"\n\tYou lost the game.\n\tyou killed %d enemies\n\tthere was still %d enemies left!\n\tgood luck next time."color_reset,enemiesCountTemp - enemiesCount, enemiesCount);
     exit(1);
 }
 
 void win(){
-    printf("win!!!"color_reset);
+    system("cls");
+    printf(color_green"\n\tYou won the game.\n\tgood job."color_reset);
     exit(1);
 }
 
 void enemyshot(){
-    for(int i = 18; i >= 0; i--){
+    for(int i = Y_DOWN - 2; i >= Y_UP; i--){
         if(enemiesHealths[i][me.x] > 0){
             if(enemiesType[i][me.x] == 1){
                 enemyShots[i + 1][me.x] = 2;
@@ -311,21 +330,37 @@ void loop(){
     }
 };
 
+void printDetails(char dificulty[]){
+    system("cls");
+    printf("\n\t difficalty = %s\n\tyou should kill %d enemies\n\tPRESS SPACE TO START", dificulty, enemiesCount);
+    while(1){
+        if(getch() == KEY_SPACE){
+            break;
+        }
+    }
+}
+
 void playEasy(){
     enemiesTime = 5;
     me.health = 7;
     enemiesCount = 15;
+    enemiesCountTemp = 15;
+    printDetails("Easy");
     loop();
 }
 void playNormal(){
     enemiesTime = 3;
     me.health = 5;
     enemiesCount = 25;
+    enemiesCountTemp = 25;
+    printDetails("Normal");
     loop();
 }
 void playHard(){
     enemiesTime = 1;
     me.health = 3;
     enemiesCount = 35;
+    enemiesCountTemp = 35;
+    printDetails("Hard");
     loop();
 }
