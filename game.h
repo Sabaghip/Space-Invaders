@@ -40,3 +40,7 @@ void printDetails(char[]);
 void looseAnimation();
 void winAnimation();
 void startAnimation();
+void autoLoop();
+void autoMove();
+void autoShoot();
+void playAuto();

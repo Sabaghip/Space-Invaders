@@ -43,6 +43,7 @@ void arrayInit(){
 }
 
 void gameInit(){
+    srand(time(NULL));
     for(int i = Y_UP; i < Y_UP + 3; i++){
         enemyRowCounter++;
         for(int j = 0; j < 4; j++){
@@ -239,7 +240,7 @@ void updateEnemies(){
     for(int i = Y_DOWN - 1; i >= Y_UP; i--){
         for(int j = 0; j < 4; j++){
             if(enemiesHealths[i][j] > 0){
-                if(i == 19){
+                if(i == Y_DOWN - 1){
                     loose();
                     return;
                 }
@@ -319,6 +320,79 @@ void loop(){
         }
         if(i % timeForEnemyShot == 0){
             enemyshot();
+            j++;
+        }
+        if(j){
+            updateLCD();
+        }
+        i++;
+        if(i > 2000){
+            i=0;
+        }
+        delay(5);
+    }
+};
+
+void autoMove(){
+    for(int i = Y_UP; i < Y_DOWN; i++){
+        if(enemyShots[i][me.x] > 0){
+            if(rand() % 2 == 0){
+                goRight();
+            }
+            else{
+                goLeft();
+            }
+            return;
+        }
+    }
+    int temp = rand();
+    if(temp % 3 == 0){
+        goRight();
+    }
+    else if(temp % 3 == 1){
+        goLeft();
+    }
+}
+
+void autoShoot(){
+    for(int i = Y_UP; i < Y_DOWN; i++){
+        if(enemiesHealths[i][me.x] > 0){
+            if(rand() % 2 == 0){
+                shoot();
+            }
+            return;
+        }
+    }
+}
+
+void autoLoop(){
+    gameInit();
+    int i = 1;
+    updateLCD();
+    int timeForEnemy = (int)(enemiesTime * 50); 
+    int timeForEnemyShot = timeForEnemy * 2;
+    int timeForAutoShoot = 9;
+    int timeForAutoMove = 12;
+    while(1){
+        int j = 0;
+        if(i % 7 == 0){
+            updateShots();
+            j++;
+        }
+        if(i % timeForEnemy == 0){
+            updateEnemies();
+            j++;
+        }
+        if(i % timeForEnemyShot == 0){
+            enemyshot();
+            j++;
+        }
+        if(i % timeForAutoMove == 0){
+            autoMove();
+            j++;
+        }
+        if(i % timeForAutoShoot == 0){
+            autoShoot();
             j++;
         }
         if(j){
@@ -461,4 +535,13 @@ void playHard(){
     printDetails("Hard");
     startAnimation();
     loop();
+}
+void playAuto(){
+    enemiesTime = 1;
+    me.health = 3;
+    enemiesCount = 35;
+    enemiesCountTemp = 35;
+    printDetails("Hard");
+    startAnimation();
+    autoLoop();
 }
