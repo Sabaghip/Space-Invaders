@@ -36,3 +36,7 @@ void loose();
 void win();
 void delay(int);
 void enemyshot();
+void printDetails(char[]);
+void looseAnimation();
+void winAnimation();
+void startAnimation();

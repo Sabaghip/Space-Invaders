@@ -270,12 +270,14 @@ void updateEnemies(){
 }
 
 void loose(){
+    looseAnimation();
     system("cls");
     printf(color_red"\n\tYou lost the game.\n\tyou killed %d enemies\n\tthere was still %d enemies left!\n\tgood luck next time."color_reset,enemiesCountTemp - enemiesCount, enemiesCount);
     exit(1);
 }
 
 void win(){
+    winAnimation();
     system("cls");
     printf(color_green"\n\tYou won the game.\n\tgood job."color_reset);
     exit(1);
@@ -330,6 +332,99 @@ void loop(){
     }
 };
 
+void startAnimation(){
+    for(int m = 0; m < 10; m++){
+        system("cls");
+        for(int i = 0; i < 20; i++){
+            for(int j = 0; j < 16; j++){
+                if((i < 10 + m - 1 && i > 10 - m - 1) || (j < m + 10 - 1 && j > 10 - m - 1)){
+                    if(((i >= 4 && i <= 5 ) && ((j <= 5  && j >= 4) || (j >= 8 && j <= 9))) || (i == 8 && (j <= 12 && j >= 3))){
+                        printf(" ");
+                    }
+                    else{
+                        printf("0");
+                    }
+                }
+                else{
+                    printf("*");
+                }
+            }
+            printf("\n");
+        }
+        delay(150);
+    }
+    for(int m = 0; m < 10; m++){
+        system("cls");
+        for(int i = 0; i < 20; i++){
+            for(int j = 0; j < 16; j++){
+                if((i < 10 + m - 1 && i > 10 - m - 1) || (j < m + 10 - 1 && j > 10 - m - 1)){
+                    printf(" ");
+                }
+                else{
+                    if(((i >= 4 && i <= 5 ) && ((j <= 5  && j >= 4) || (j >= 8 && j <= 9))) || (i == 8 && (j <= 12 && j >= 3))){
+                        printf(" ");
+                    }
+                    else{
+                        printf("*");
+                    }
+                }
+            }
+            printf("\n");
+        }
+        delay(150);
+    }
+}
+
+void winAnimation(){
+    printf(color_green"");
+    for(int m = 0; m < 10; m++){
+        system("cls");
+        for(int i = 0; i < 20; i++){
+            for(int j = 0; j < 16; j++){
+                if((i < 10 + m - 1 && i > 10 - m - 1) || (j < m + 10 - 1 && j > 10 - m - 1)){
+                    if(((i >= 4 && i <= 5 ) && ((j <= 5  && j >= 4) || (j >= 8 && j <= 9))) || (i == 8 && (j <= 12 && j >= 3))){
+                        printf(" ");
+                    }
+                    else{
+                        printf("0");
+                    }
+                }
+                else{
+                    printf("*");
+                }
+            }
+            printf("\n");
+        }
+        delay(150);
+    }
+    printf(color_reset"");
+}
+
+void looseAnimation(){
+    printf(color_red"");
+    for(int m = 0; m < 10; m++){
+        system("cls");
+        for(int i = 0; i < 20; i++){
+            for(int j = 0; j < 16; j++){
+                if((i < 10 + m - 1 && i > 10 - m - 1) || (j < m + 10 - 1 && j > 10 - m - 1)){
+                    if(((i >= 4 && i <= 5 ) && ((j <= 5  && j >= 4) || (j >= 8 && j <= 9))) || (i == 8 && (j <= 12 && j >= 3))){
+                        printf(" ");
+                    }
+                    else{
+                        printf("0");
+                    }
+                }
+                else{
+                    printf("*");
+                }
+            }
+            printf("\n");
+        }
+        delay(150);
+    }
+    printf(color_reset"");
+}
+
 void printDetails(char dificulty[]){
     system("cls");
     printf("\n\t difficalty = %s\n\tyou should kill %d enemies\n\tPRESS SPACE TO START", dificulty, enemiesCount);
@@ -346,6 +441,7 @@ void playEasy(){
     enemiesCount = 15;
     enemiesCountTemp = 15;
     printDetails("Easy");
+    startAnimation();
     loop();
 }
 void playNormal(){
@@ -354,6 +450,7 @@ void playNormal(){
     enemiesCount = 25;
     enemiesCountTemp = 25;
     printDetails("Normal");
+    startAnimation();
     loop();
 }
 void playHard(){
@@ -362,5 +459,6 @@ void playHard(){
     enemiesCount = 35;
     enemiesCountTemp = 35;
     printDetails("Hard");
+    startAnimation();
     loop();
 }
